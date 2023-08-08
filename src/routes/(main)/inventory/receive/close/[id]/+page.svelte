@@ -1,0 +1,194 @@
+<script>
+	import Th from '../../../../../../lib/components/Th.svelte';
+	import Tr from '../../../../../../lib/components/Tr.svelte';
+	import Td from '../../../../../../lib/components/Td.svelte';
+	import formatMoney from '../../../../../../utils/format_money';
+	import { dateToIsoDateString } from '../../../../../../lib/utils/dateToIsoDateString';
+	import formatPhone from '../../../../../../utils/format_phone';
+
+	export let data;
+	let receive = data.receive;
+	let details = receive.details.edges.map(
+		(e) => e.node
+	);
+</script>
+
+<section class="flex flex-col border rounded">
+	<div
+		class="bg-primary py-2 px-5 text-lg text-white"
+	>
+		입고정보
+	</div>
+	<div
+		class="flex wrap justify-between items-center px-7 py-5 "
+	>
+		<div class="flex flex-col">
+			<label class="text-sm">입고일자</label>
+			<div class="mt-3">
+				{dateToIsoDateString(receive.dateCreated)}
+			</div>
+		</div>
+		<div class="flex flex-col">
+			<label class="text-sm">발주일자</label>
+			<div class="mt-3">
+				{dateToIsoDateString(
+					receive.inventoryOrderMaster.dateCreated
+				)}
+			</div>
+		</div>
+		<div class="flex flex-col">
+			<label class="text-sm">발주상태</label>
+			<div class="mt-3">
+				{receive.state}
+			</div>
+		</div>
+		<div />
+	</div>
+</section>
+<section
+	class="flex flex-col border rounded mt-5"
+>
+	<div
+		class="bg-primary py-2 px-5 text-lg text-white"
+	>
+		거래처 정보
+	</div>
+	<div
+		class="flex wrap justify-between items-center px-7 py-5 "
+	>
+		<div class="flex flex-col">
+			<label class="text-sm">거래처</label>
+			<div class="mt-3">
+				{receive.inventoryOrderMaster.supplier
+					.name}
+			</div>
+		</div>
+		<div class="flex flex-col">
+			<label class="text-sm">담당자</label>
+			<div class="mt-3">
+				{receive.inventoryOrderMaster.supplier
+					.manager}
+			</div>
+		</div>
+		<div class="flex flex-col">
+			<label class="text-sm">전화번호</label>
+			<div class="mt-3">
+				{formatPhone(
+					receive.inventoryOrderMaster.supplier
+						.phone
+				)}
+			</div>
+		</div>
+		<div class="flex flex-col">
+			<label class="text-sm">이메일</label>
+			<div class="mt-3">
+				{receive.inventoryOrderMaster.supplier
+					.email}
+			</div>
+		</div>
+		<div class="flex flex-col">
+			<label class="text-sm">팩스번호</label>
+			<div class="mt-3">
+				{receive.inventoryOrderMaster.supplier
+					.fax}
+			</div>
+		</div>
+	</div>
+</section>
+
+<main class="mt-5 flex flex-col">
+	<div
+		class="flex flex-col rounded border mt-3 overflow-hidden"
+	>
+		<div
+			class="bg-primary py-2 px-5 text-lg text-white"
+		>
+			입고내용
+		</div>
+		<div class="">
+			<table class="w-full">
+				<thead>
+					<tr class="">
+						<Th>상품</Th>
+						<Th>색상</Th>
+						<Th>사이즈</Th>
+						<Th>단가</Th>
+						<Th>발주수량</Th>
+						<Th>입고수량</Th>
+						<Th>미입고수량</Th>
+						<Th>발주금액</Th>
+						<Th>입고금액</Th>
+						<Th>미입고사유</Th>
+						<Th>추가입고수량</Th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each details as detail}
+						<Tr>
+							<Td>
+								{detail.name}
+							</Td>
+							<Td>
+								{detail.color}
+							</Td>
+							<Td>
+								{detail.size}
+							</Td>
+							<Td>
+								{formatMoney(detail.priceVendor)}
+							</Td>
+							<Td>
+								{detail.quantityOrdered}
+							</Td>
+							<Td>
+								{detail.quantityReceived}
+							</Td>
+							<Td>
+								{detail.quantityNotReceived}
+							</Td>
+							<Td>
+								{formatMoney(detail.priceOrdered)}
+							</Td>
+							<Td>
+								{formatMoney(
+									detail.priceReceived
+								)}
+							</Td>
+							<Td
+								>{detail.reasonNotReceived ??
+									'-'}</Td
+							>
+						</Tr>
+					{/each}
+					<Tr>
+						<Td classes="text-lg" colspan="4"
+							>합계</Td
+						>
+						<Td classes="text-lg">
+							{receive.quantityTotalOrdered}
+						</Td>
+						<Td classes="text-lg">
+							{receive.quantityTotalReceived}
+						</Td>
+						<Td classes="text-lg">
+							{receive.quantityTotalNotReceived}
+						</Td>
+						<Td classes="text-lg">
+							{formatMoney(
+								receive.priceTotalOrdered
+							)}
+						</Td>
+						<Td classes="text-lg">
+							{formatMoney(
+								receive.priceTotalReceived
+							)}
+						</Td>
+						<Td />
+					</Tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</main>
+
+<div class="my-10" />
